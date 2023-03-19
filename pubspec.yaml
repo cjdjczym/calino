@@ -1,0 +1,37 @@
+name: calino
+description: A new Flutter project.
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=2.18.2 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  camera:
+  connectivity: ^3.0.6
+  dio: ^4.0.6
+  expandable: ^5.0.1
+  fluttertoast: ^8.0.8
+  flutter_screenutil: ^5.5.4
+  image_gallery_saver: ^1.7.1
+  mobile_scanner: ^2.1.0
+  shared_preferences: ^2.0.16
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/
+    - assets/user/
+    - assets/user/scan/
+    - assets/user/toast/
+    - assets/user/userCenter/
