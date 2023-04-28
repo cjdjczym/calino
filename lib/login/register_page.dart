@@ -35,7 +35,7 @@ class _RegisterPageState extends State<RegisterPage> {
     } else if (phone.length != 11) {
       Toast.show('手机号格式错误');
     } else {
-      await LoginService.getRegisterCaptcha(phone);
+      await LoginService.getRegisterCaptcha(phone, widget.sub);
       setState(() {
         lock = true;
       });
@@ -115,6 +115,7 @@ class _RegisterPageState extends State<RegisterPage> {
               onChanged: (text) => phone = text,
               hint: '请输入手机号作为账号',
               type: TextInputType.phone,
+              tiny: true,
             ),
             SizedBox(height: 10.h),
             Text('验证手机号', style: TextStyle(color: Colors.white, fontSize: 16)),
@@ -129,6 +130,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     height: 42.h,
                     onChanged: (text) => code = text,
                     hint: '请输入验证码',
+                    tiny: true,
                   ),
                   Spacer(),
                   lock
@@ -182,7 +184,8 @@ class _RegisterPageState extends State<RegisterPage> {
               width: 342.w,
               height: 42.h,
               onChanged: (text) => pw1 = text,
-              hint: '请输入密码',
+              hint: '密码须包含字母和数字，长度至少9位',
+              tiny: true,
             ),
             SizedBox(height: 10.h),
             Text('确认密码', style: TextStyle(color: Colors.white, fontSize: 16)),
@@ -192,6 +195,7 @@ class _RegisterPageState extends State<RegisterPage> {
               height: 42.h,
               onChanged: (text) => pw2 = text,
               hint: '请再次输入密码',
+              tiny: true,
             ),
             SizedBox(height: 10.h),
             Text('身份证号', style: TextStyle(color: Colors.white, fontSize: 16)),
@@ -201,6 +205,7 @@ class _RegisterPageState extends State<RegisterPage> {
               height: 42.h,
               onChanged: (text) => idCard = text,
               hint: '请输入身份证号',
+              tiny: true,
             ),
             SizedBox(height: 10.h),
             Text('姓名', style: TextStyle(color: Colors.white, fontSize: 16)),
@@ -222,6 +227,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 height: 42.h,
                 onChanged: (text) => corpName = text,
                 hint: '请输入养殖场名称',
+                tiny: true,
               ),
             ],
             SizedBox(height: 20.h),

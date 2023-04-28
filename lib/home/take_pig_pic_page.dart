@@ -52,12 +52,46 @@ class _TakePigPicPageState extends State<TakePigPicPage> {
     });
   }
 
+  bool running = false;
+
   tackPicture() async {
-    if (widget.type == PigFuncType.IDENTIFY && SpUtil.identifyFull) return;
     if (ctl == null) return;
+    if (running) return;
+    running = true;
     XFile file = await ctl!.takePicture();
-    Toast.show('拍摄了一张照片');
-    SpUtil.addPic(file.path, widget.type);
+    if (widget.type == PigFuncType.COUNT) {
+      SpUtil.addPic(file.path, widget.type);
+    } else {
+      var result = Identify.addPic(file.path);
+      if (result >= 0) {
+        Toast.custom(
+            child: Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.black,
+                borderRadius: BorderRadius.circular(25),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset('assets/check.png', width: 60, height: 60),
+                  SizedBox(height: 20),
+                  Text('第${result + 1}只猪拍摄完成',
+                      style: TextStyle(color: Colors.white, fontSize: 18)),
+                ],
+              ),
+            ),
+            positionedToastBuilder: (context, child) {
+              return Positioned(
+                left: 15,
+                right: 15,
+                top: 0.4.sh,
+                child: child,
+              );
+            });
+      }
+    }
+    running = false;
     setState(() {});
   }
 
@@ -88,32 +122,76 @@ class _TakePigPicPageState extends State<TakePigPicPage> {
                     : Stack(
                         children: [
                           Positioned.fill(child: CameraPreview(ctl!)),
-                          if (widget.type == PigFuncType.IDENTIFY &&
-                              !SpUtil.identifyFull)
+                          if (widget.type == PigFuncType.IDENTIFY)
                             Center(
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Image.asset(
-                                    'assets/pig${SpUtil.identifyIndex + 1}.png',
-                                    width: 199.w,
-                                    height: 283.h,
+                                    'assets/pig${Identify.identifyType + 1}.png',
+                                    width: 300.w,
+                                    height: 300.h,
                                   ),
                                   Text(
-                                      identifyCameraTexts[SpUtil.identifyIndex],
+                                      identifyCameraTexts[
+                                          Identify.identifyType],
                                       style: TextStyle(
                                           color: Colors.white, fontSize: 16)),
+                                  SizedBox(height: 20),
+                                  SizedBox(
+                                    height: 8,
+                                    width: 8 * 5,
+                                    child: Row(
+                                      children: [
+                                        Container(
+                                          width: 8,
+                                          height: 8,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(100),
+                                            color: Identify.identifyIndex >= 1
+                                                ? Colors.blue
+                                                : Colors.white,
+                                          ),
+                                        ),
+                                        SizedBox(width: 8),
+                                        Container(
+                                          width: 8,
+                                          height: 8,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(100),
+                                            color: Identify.identifyIndex >= 2
+                                                ? Colors.blue
+                                                : Colors.white,
+                                          ),
+                                        ),
+                                        SizedBox(width: 8),
+                                        Container(
+                                          width: 8,
+                                          height: 8,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(100),
+                                            color: Identify.identifyIndex >= 3
+                                                ? Colors.blue
+                                                : Colors.white,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
                                 ],
                               ),
                             ),
                           if (widget.type == PigFuncType.IDENTIFY &&
-                              !SpUtil.identifyEmpty)
+                              !Identify.allFinish)
                             Positioned(
                               top: 12.r,
                               right: 12.r,
                               child: Button(
                                 press: () {
-                                  SpUtil.identifyClear();
+                                  Identify.clearUnfinished();
                                   setState(() {});
                                 },
                                 type: ButtonType.HALF,
@@ -146,7 +224,7 @@ class _TakePigPicPageState extends State<TakePigPicPage> {
                     child: Text(
                         widget.type == PigFuncType.COUNT
                             ? '拍摄'
-                            : identifyButtonTexts[SpUtil.identifyIndex],
+                            : identifyButtonTexts[Identify.identifyType],
                         style: TextStyle(color: Colors.white, fontSize: 16)),
                   ),
                 ),

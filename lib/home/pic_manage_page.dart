@@ -25,8 +25,8 @@ class _PicManagePageState extends State<PicManagePage> {
     if (selected.isEmpty) {
       Toast.show('请至少选择一张图片');
     } else if (widget.type == PigFuncType.IDENTIFY) {
-      if (selected.length != 9) {
-        Toast.show('缺少${9 - selected.length}张图片，请继续拍摄');
+      if (selected.length % 9 != 0) {
+        Toast.show('缺少${9 - (selected.length % 9)}张图片，请继续拍摄');
       } else {
         var real = SpUtil.getPics(widget.type).map((e) => '$e').toList();
         await HomeService.uploadPics(real, widget.type);
@@ -37,7 +37,7 @@ class _PicManagePageState extends State<PicManagePage> {
       }
     } else {
       var real = selected
-          .map((e) => SpUtil.getPics(widget.type)[e - 1].toString())
+          .map((e) => SpUtil.getPics(widget.type)[e - 1].toString ())
           .toList();
       await HomeService.uploadPics(real, widget.type);
       real.forEach((e) => SpUtil.delPic(e, widget.type));
@@ -70,8 +70,8 @@ class _PicManagePageState extends State<PicManagePage> {
           ),
           selected.contains(index)
               ? Container(
-                  width: 10.r,
-                  height: 10.r,
+                  width: 13.r,
+                  height: 13.r,
                   alignment: Alignment.center,
                   margin: EdgeInsets.fromLTRB(0, 3, 3, 0),
                   decoration: BoxDecoration(

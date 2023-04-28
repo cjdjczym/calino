@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:calino/commons/prefs.dart';
 import 'package:flutter/material.dart' show Offset;
 
 String formatDate(DateTime date) => date.toString().split('.')[0];
@@ -75,7 +78,7 @@ class SingleCount {
       : id = json['id'].toString(),
         count = json['count'] ?? 0,
         posList =
-            List<Offset>.from(json['positions'].map((e) => parseOffset(e))),
+            List<Offset>.from(json['positions'].map((e) => _parseOffset(e))),
         url = json['url'] ?? '',
         modifyList = List<CountModify>.from(
             json['modifications'].map((e) => CountModify.fromJson(e)));
@@ -104,7 +107,7 @@ class CountModify {
       : updateAt = json['updateAt'] ?? '',
         name = json['name'] ?? '',
         sub = json['isSub'] ?? false,
-        pos = parseOffset(json),
+        pos = _parseOffset(json),
         index = int.parse(json['index']),
         isAdd = json['isAdd'],
         hint = json['hint'] ??
@@ -113,5 +116,122 @@ class CountModify {
                 : '删除识别序号为${int.parse(json['index']) + 1}的猪只，此图中猪只数目减少1');
 }
 
-Offset parseOffset(dynamic json) =>
+Offset _parseOffset(dynamic json) =>
     Offset(double.parse(json['x'] ?? '0.0'), double.parse(json['y'] ?? '0.0'));
+
+class IdentifyPicBean {
+  final List<IdentifyPic> list;
+
+  IdentifyPicBean() : list = [];
+
+  IdentifyPicBean.fromJson(Map<String, dynamic> map)
+      : list = []
+          ..addAll((map['list'] as List).map((e) => IdentifyPic.fromJson(e)));
+
+  Map<String, dynamic> toJson() => {
+        'list': list.map((e) => e.toJson()).toList(),
+      };
+}
+
+class IdentifyPic {
+  final List<String> front;
+  final List<String> left;
+  final List<String> right;
+
+  IdentifyPic()
+      : this.front = [],
+        this.left = [],
+        this.right = [];
+
+  IdentifyPic.fromJson(Map<String, dynamic> map)
+      : front = []..addAll((map['front'] as List).map((e) => '$e')),
+        left = []..addAll((map['left'] as List).map((e) => '$e')),
+        right = []..addAll((map['right'] as List).map((e) => '$e'));
+
+  Map<String, dynamic> toJson() => {
+        'front': front,
+        'left': left,
+        'right': right,
+      };
+
+  int get count => front.length + left.length + right.length;
+}
+
+/// 工具类
+class Identify {
+  Identify._();
+
+  static IdentifyPicBean get _bean {
+    if (SpUtil.identityPics.value == '') return IdentifyPicBean();
+    return IdentifyPicBean.fromJson(json.decode(SpUtil.identityPics.value));
+  }
+
+  static bool get allFinish => _bean.list.every((e) => e.count == 9);
+
+  static void clearUnfinished() => _bean.list.removeWhere((e) => e.count != 9);
+
+  static List<String> get pics {
+    var rst = <String>[];
+    _bean.list.forEach((e) {
+      rst.addAll(e.front);
+      rst.addAll(e.left);
+      rst.addAll(e.right);
+    });
+    return rst;
+  }
+
+  static int get identifyType {
+    for (var e in _bean.list) {
+      if (e.front.length != 3) return 0;
+      if (e.left.length != 3) return 1;
+      if (e.right.length != 3) return 2;
+    }
+    return 0;
+  }
+
+  static int get identifyIndex {
+    for (var e in _bean.list) {
+      if (e.front.length != 3) return e.front.length;
+      if (e.left.length != 3) return e.left.length;
+      if (e.right.length != 3) return e.right.length;
+    }
+    return 0;
+  }
+
+  static int addPic(String path) {
+    var bean = _bean;
+    for (int i = 0; i < bean.list.length; i++) {
+      var e = bean.list[i];
+      if (e.count != 9) {
+        if (e.front.length != 3)
+          e.front.add(path);
+        else if (e.left.length != 3)
+          e.left.add(path);
+        else
+          e.right.add(path);
+        SpUtil.identityPics.value = json.encode(bean.toJson());
+        return e.count == 9 ? i : -1;
+      }
+    }
+    bean.list.add(IdentifyPic()..front.add(path));
+    SpUtil.identityPics.value = json.encode(bean.toJson());
+    return -1;
+  }
+
+  static void delPic(String path) {
+    var bean = _bean;
+    for (var e in bean.list) {
+      if (e.front.contains(path)) {
+        e.front.remove(path);
+      } else if (e.left.contains(path)) {
+        e.left.remove(path);
+      } else if (e.right.contains(path)) {
+        e.right.remove(path);
+      } else {
+        continue;
+      }
+      break;
+    }
+    SpUtil.identityPics.value = json.encode(bean.toJson());
+  }
+}

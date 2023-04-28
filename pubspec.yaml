@@ -16,7 +16,7 @@ dependencies:
   connectivity: ^3.0.6
   dio: ^4.0.6
   expandable: ^5.0.1
-  fluttertoast: ^8.0.8
+  fluttertoast: ^8.2.1
   flutter_screenutil: ^5.5.4
   image_gallery_saver: ^1.7.1
   mobile_scanner: ^2.1.0

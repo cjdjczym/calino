@@ -18,52 +18,13 @@ class SpUtil {
   static final userData = Prefs<String>('userData', '');
 
   static final countPics = Prefs<List>('countPics', []);
-  static final identityPics = Prefs<List>('identityPics', []);
-  static final identityCount = Prefs<List>('identityCount', ['0', '0', '0']);
-
-  static List<int> get count {
-    var list = [0, 0, 0];
-    list[0] = int.parse(identityCount.value[0]);
-    list[1] = int.parse(identityCount.value[1]);
-    list[2] = int.parse(identityCount.value[2]);
-    return list;
-  }
-
-  static List<String> format(List<int> list) => list.map((e) => '$e').toList();
-
-  static bool get identifyFull => count.every((e) => e == 3);
-
-  static bool get identifyEmpty => count.every((e) => e == 0);
-
-  static int get identifyIndex =>
-      count[0] == 3
-          ? count[1] == 3
-          ? 2
-          : 1
-          : 0;
-
-  static void identifyClear() {
-    identityPics.value = [];
-    identityCount.value = ['0', '0', '0'];
-  }
+  static final identityPics = Prefs<String>('identityPics');
 
   static void addPic(String path, PigFuncType type) {
     if (type == PigFuncType.COUNT) {
       var copy = countPics.value.toList();
       copy.add(path);
       countPics.value = copy;
-    } else {
-      var copy1 = identityPics.value.toList();
-      copy1.add(path);
-      identityPics.value = copy1;
-      var copy2 = count;
-      if (count[0] < 3)
-        copy2[0]++;
-      else if (count[1] < 3)
-        copy2[1]++;
-      else
-        copy2[2]++;
-      identityCount.value = format(copy2);
     }
   }
 
@@ -73,28 +34,12 @@ class SpUtil {
       copy.remove(path);
       countPics.value = copy;
     } else {
-      var copy1 = identityPics.value.toList();
-      var index = copy1.indexOf(path);
-      index++;
-      var copy2 = count;
-      if (index > count[0]) {
-        index -= count[0];
-        if (index > count[1]) {
-          copy2[2]--;
-        } else {
-          copy2[1]--;
-        }
-      } else {
-        copy2[0]--;
-      }
-      identityCount.value = format(copy2);
-      copy1.remove(path);
-      identityPics.value = copy1;
+      Identify.delPic(path);
     }
   }
 
   static List getPics(PigFuncType type) =>
-      type == PigFuncType.COUNT ? countPics.value : identityPics.value;
+      type == PigFuncType.COUNT ? countPics.value : Identify.pics;
 
   static void logout() {
     isLogin.clear();

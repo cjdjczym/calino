@@ -27,10 +27,10 @@ class LoginService {
     );
   }
 
-  static Future<void> getRegisterCaptcha(String mobile) async {
+  static Future<void> getRegisterCaptcha(String mobile, bool invite) async {
     await Network.post(
       base + 'app/auth/register/send-sms-code',
-      data: json.encode({'mobile': mobile, 'scene': 3}),
+      data: json.encode({'mobile': mobile, 'scene': invite ? 4 : 3}),
     );
   }
 
@@ -44,6 +44,7 @@ class LoginService {
     time = time + ':00';
     SpUtil.expiresTime.value = time;
     SpUtil.refreshToken.value = response.data['data']['refreshToken'];
+    SpUtil.isLogin.value = true;
     UserService.getUserData();
   }
 
@@ -57,6 +58,7 @@ class LoginService {
     time = time + ':00';
     SpUtil.expiresTime.value = time;
     SpUtil.refreshToken.value = response.data['data']['refreshToken'];
+    SpUtil.isLogin.value = true;
     UserService.getUserData();
   }
 

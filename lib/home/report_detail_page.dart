@@ -106,7 +106,7 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
                       children: [
                         Positioned.fill(
                           child: Image.network(
-                            widget.report.countList[index].url,
+                            'http://117.176.111.88:1300/inventory/' + widget.report.countList[index].url,
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -294,7 +294,7 @@ class _ReportDetailPageState extends State<ReportDetailPage> {
                   children: [
                     Positioned.fill(
                       child: Image.network(
-                        widget.report.identifyList[index].url,
+                        'http://117.176.111.88:1300/pig-face/' + widget.report.identifyList[index].url,
                         fit: BoxFit.cover,
                       ),
                     ),
